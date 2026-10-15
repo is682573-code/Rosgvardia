@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учебный центр Росгвардии</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --bg2:#161d2e;
+    --card:#1c2438;
+    --line:#2b3651;
+    --txt:#e6ebf5;
+    --muted:#9aa8c4;
+    --gold:#d4af37;
+    --blue:#3b6ea5;
+    --ok:#2e9e5b;
+    --bad:#c0392b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg),var(--bg2));
+    color:var(--txt);line-height:1.6;min-height:100vh;
+  }
+  header{
+    background:linear-gradient(90deg,#0b1120,#1a2540);
+    border-bottom:3px solid var(--gold);
+    padding:22px 20px;text-align:center;
+  }
+  header h1{margin:0;font-size:26px;letter-spacing:1px;}
+  header h1 span{color:var(--gold);}
+  header p{margin:6px 0 0;color:var(--muted);font-size:14px;}
+  nav{
+    display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+    background:var(--bg2);padding:12px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:10;
+  }
+  nav button{
+    background:transparent;color:var(--muted);border:1px solid var(--line);
+    padding:9px 16px;border-radius:6px;cursor:pointer;font-size:14px;
+    transition:.15s;
+  }
+  nav button:hover{color:var(--txt);border-color:var(--gold);}
+  nav button.active{background:var(--gold);color:#0f1420;font-weight:600;border-color:var(--gold);}
+  main{max-width:960px;margin:0 auto;padding:26px 18px 80px;}
+  section{display:none;animation:fade .25s ease;}
+  section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  h2{color:var(--gold);border-left:4px solid var(--gold);padding-left:12px;margin-top:34px;font-size:21px;}
+  h2:first-child{margin-top:0;}
+  h3{color:#cbd6ee;font-size:17px;margin:22px 0 8px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:18px 20px;margin:14px 0;
+  }
+  ul{padding-left:22px;}
+  li{margin:5px 0;}
+  .warn{border-left:4px solid var(--bad);}
+  .note{border-left:4px solid var(--blue);}
+  .tip{border-left:4px solid var(--ok);}
+  .tag{
+    display:inline-block;background:#0e1626;border:1px solid var(--line);
+    color:var(--gold);font-size:12px;padding:2px 8px;border-radius:4px;margin-right:6px;
+  }
+  code{background:#0e1626;padding:2px 6px;border-radius:4px;color:#8fd3ff;font-size:13px;}
+
+  /* ==== ТЕСТ ==== */
+  .quiz-top{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+    gap:10px;margin-bottom:16px;
+  }
+  .progress{color:var(--muted);font-size:14px;}
+  .q{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin-bottom:14px;
+  }
+  .q .qt{font-weight:600;margin-bottom:12px;}
+  .q .qt .num{color:var(--gold);margin-right:6px;}
+  .opt{
+    display:block;background:#131a2a;border:1px solid var(--line);
+    border-radius:7px;padding:10px 14px;margin:7px 0;cursor:pointer;
+    transition:.12s;font-size:15px;
+  }
+  .opt:hover{border-color:var(--blue);}
+  .opt input{margin-right:10px;accent-color:var(--gold);}
+  .opt.correct{border-color:var(--ok);background:rgba(46,158,91,.15);}
+  .opt.wrong{border-color:var(--bad);background:rgba(192,57,43,.15);}
+  .btn{
+    background:var(--gold);color:#0f1420;border:none;padding:12px 26px;
+    border-radius:7px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;
+  }
+  .btn:hover{background:#e8c455;}
+  .btn.sec{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+  .btn.sec:hover{background:rgba(212,175,55,.12);}
+  .result{
+    background:var(--card);border:2px solid var(--gold);border-radius:10px;
+    padding:22px;text-align:center;margin-bottom:20px;
+  }
+  .result .score{font-size:44px;font-weight:800;color:var(--gold);}
+  .result .verdict{margin-top:8px;font-size:16px;}
+  .review{margin-top:22px;}
+  .review .item{
+    background:var(--card);border-left:4px solid var(--bad);
+    border-radius:8px;padding:14px 16px;margin-bottom:10px;font-size:14px;
+  }
+  .review .item b{color:#ff9b8a;}
+  .review .item .r{color:#8fe0a8;}
+  .center{text-align:center;margin-top:24px;}
+  footer{
+    text-align:center;color:var(--muted);font-size:13px;
+    padding:20px;border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎖️ УЧЕБНЫЙ ЦЕНТР <span>РОСГВАРДИИ</span></h1>
+  <p>Программа подготовки младшего состава · Проверка документов на КПП</p>
+</header>
+
+<nav>
+  <button class="active" data-tab="intro">1. Введение в службу</button>
+  <button data-tab="kpp">2. Работа на КПП</button>
+  <button data-tab="radio">3. Радиосвязь и доклады</button>
+  <button data-tab="exam">4. Итоговый тест</button>
+</nav>
+
+<main>
+
+<!-- ================= 1. ВВЕДЕНИЕ ================= -->
+<section id="intro" class="active">
+  <h2>1. Введение в службу</h2>
+
+  <div class="card">
+    <h3>Задачи и обязанности</h3>
+    <ul>
+      <li>Охрана объекта, территории и контрольно-пропускного пункта (КПП).</li>
+      <li>Контроль пропускного режима: допуск только лиц, имеющих на это право.</li>
+      <li>Пресечение попыток несанкционированного проникновения.</li>
+      <li>Доклад о любой нештатной ситуации вышестоящему руководству.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Иерархия и подчинение</h3>
+    <ul>
+      <li><span class="tag">Младший состав</span>рядовой, ефрейтор, капрал, сержант.</li>
+      <li><span class="tag">Офицерский состав</span>лейтенант, капитан, майор, полковник.</li>
+      <li><span class="tag">Высшее командование</span>генералитет во главе с командующим.</li>
+    </ul>
+    <p><b>Правило:</b> приказ отдаёт только старший по званию или по должности. При равных званиях — тот, кто назначен старшим наряда.</p>
+  </div>
+
+  <div class="card">
+    <h3>Субординация и дисциплина</h3>
+    <ul>
+      <li>Обращение к старшему — только на «Вы» и по званию/должности.</li>
+      <li>Военнослужащий младшего состава не обсуждает приказ, а выполняет его, если он не противоречит уставу.</li>
+      <li>Спор с руководством в рабочее время недопустим — разбирательство после смены.</li>
+      <li>Обращение к начальнику: «Товарищ [звание], разрешите обратиться».</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Правила доклада</h3>
+    <ul>
+      <li>О заступлении: «Товарищ [звание], боец [ФИО/позывной] заступил на пост КПП. Докладывает [звание, ФИО]».</li>
+      <li>О прибытии начальства: «Смирно! Товарищ [звание], на посту [название] — [ФИО]».</li>
+      <li>О сдаче поста: «Пост КПП сдан. Замечаний нет».</li>
+      <li>Доклад всегда короткий, чёткий, по существу.</li>
+    </ul>
+  </div>
+
+  <div class="card tip">
+    <b>Запомните:</b> чёткий доклад — это половина службы. Мямлить, спорить и молчать в эфире — это не «скромность», а нарушение.
+  </div>
+</section>
+
+<!-- ================= 2. КПП ================= -->
+<section id="kpp">
+  <h2>2. Работа на контрольно-пропускном пункте</h2>
+
+  <div class="card">
+    <h3>Заступление на пост</h3>
+    <ol>
+      <li>Принять пост у предыдущего караульного, осмотреть вверенное имущество.</li>
+      <li>Проверить наличие средств связи, бланков, оружия (если предусмотрено).</li>
+      <li>Доложить о заступлении по установленной форме.</li>
+      <li>Покидать пост без разрешения начальника — <b>запрещено</b>.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Алгоритм проверки документов</h3>
+    <ol>
+      <li>Попросить предъявить документ, удостоверяющий личность и пропуск.</li>
+      <li><b>Внешний осмотр:</b> целостность, отсутствие подчисток, исправлений, переклеек.</li>
+      <li><b>Сличение фото</b> с лицом предъявителя.</li>
+      <li><b>Проверка данных:</b> ФИО, срок действия, принадлежность к организации.</li>
+      <li><b>Проверка основания входа:</b> разрешение на въезд/вход, цель визита.</li>
+      <li>Убедиться, что документ входит в перечень действительных для данного объекта.</li>
+    </ol>
+  </div>
+
+  <div class="card warn">
+    <h3>Действия при подозрительном документе</h3>
+    <ul>
+      <li><b>Не возвращать документ в руки владельца.</b> Взять в свои руки, удерживать.</li>
+      <li>Вести себя вежливо, но твёрдо. Не идти на конфликт.</li>
+      <li>Незамедлительно доложить начальнику караула / дежурному по рации.</li>
+      <li>Действовать по указанию руководства. Самостоятельные решения не принимать.</li>
+    </ul>
+  </div>
+
+  <div class="card warn">
+    <h3>Действия при отказе предъявить документы</h3>
+    <ul>
+      <li>Спокойно и вежливо повторить требование о предъявлении документов.</li>
+      <li>Разъяснить, что проход/проезд без документов запрещён.</li>
+      <li>Не впускать и не выпускать лицо до выяснения обстоятельств.</li>
+      <li>Доложить старшему наряда. При необходимости — вызвать подкрепление.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Досмотр транспорта</h3>
+    <ul>
+      <li>Проводится на специальной площадке, <b>при закрытых воротах</b>.</li>
+      <li>Водителя просят заглушить двигатель и выйти из машины.</li>
+      <li>Досмотр ведётся в присутствии начальника караула.</li>
+      <li>Осмотр салона, багажника, подкапотного пространства — по регламенту.</li>
+    </ul>
+  </div>
+
+  <div class="card note">
+    <b>Важно:</b> чем спокойнее и увереннее ведёт себя боец на КПП, тем меньше провокаций. Конфликтные диалоги — прямое нарушение дисциплины.
+  </div>
+</section>
+
+<!-- ================= 3. РАДИО ================= -->
+<section id="radio">
+  <h2>3. Радиосвязь и доклады</h2>
+
+  <div class="card">
+    <h3>Позывные и коды</h3>
+    <ul>
+      <li>Каждый пост и должностное лицо имеет свой постоянный позывной.</li>
+      <li>Позывные выдаются один раз и не меняются в течение смены.</li>
+      <li>Радиокоды (пример): <code>Код-1</code> — порядок, <code>Код-2</code> — срочная помощь, <code>Код-3</code> — опасность.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Правила радиообмена</h3>
+    <ul>
+      <li>Говорить коротко и по существу: кто, где, что случилось.</li>
+      <li>Не перебивать, соблюдать очерёдность.</li>
+      <li>Не использовать эфир для личных разговоров.</li>
+      <li>Убедиться, что тебя услышали, прежде чем закончить передачу.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Виды докладов</h3>
+    <ul>
+      <li><b>Обычный доклад:</b> плановая информация, текущая обстановка.</li>
+      <li><b>Срочный доклад:</b> нападение, ЧП, обнаружение запрещённого, потеря связи.</li>
+      <li>Срочный доклад передаётся немедленно, вне очереди.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 4. ТЕСТ ================= -->
+<section id="exam">
+  <h2>4. Итоговый тест</h2>
+  <div class="card note">
+    Тест можно проходить <b>неограниченное количество раз</b>. Вопросы и варианты ответов
+    перемешиваются при каждой попытке. Регистрация не требуется.
+  </div>
+
+  <div id="quizStart" class="center">
+    <button class="btn" onclick="startQuiz()">Начать тест</button>
+  </div>
+
+  <div id="quizBox" style="display:none;">
+    <div class="quiz-top">
+      <div class="progress" id="progress"></div>
+      <div class="progress" id="answered"></div>
+    </div>
+    <div id="questions"></div>
+    <div class="center">
+      <button class="btn" id="submitBtn" onclick="submitQuiz()">Завершить тест</button>
+    </div>
+  </div>
+
+  <div id="resultBox"></div>
+</section>
+
+</main>
+
+<footer>Учебный центр Росгвардии · внутренний ресурс подготовки личного состава</footer>
+
+<script>
+/* ================== БАНК ВОПРОСОВ ==================
+   Добавляйте свои вопросы: {q:"...", a:["...","..."], c:0, t:"тема"}
+   c — индекс правильного ответа (считается с нуля).
+*/
+const QUESTIONS = [
+ {q:"Что нужно сделать в первую очередь при заступлении на пост?", a:[
+   "Осмотреть пост и доложить о заступлении",
+   "Позвонить родным",
+   "Уйти на обход территории",
+   "Сразу начать досмотр транспорта"], c:0, t:"КПП"},
+
+ {q:"Разрешено ли возвращать документ, если возникли сомнения в его подлинности?", a:[
+   "Да, чтобы не задерживать человека",
+   "Нет, документ удерживается до доклада начальнику",
+   "Да, если человек торопится",
+   "Только если документ просрочен"], c:1, t:"КПП"},
+
+ {q:"Где проводится досмотр транспорта?", a:[
+   "Прямо на въезде, при открытых воротах",
+   "На специальной площадке при закрытых воротах",
+   "Внутри объекта, после пропуска",
+   "Только по требованию водителя"], c:1, t:"КПП"},
+
+ {q:"Что делать, если посетитель отказывается предъявить документы?", a:[
+   "Пропустить без документов",
+   "Спокойно повторить требование и доложить старшему наряда",
+   "Ударить его",
+   "Уйти в помещение и забыть о нём"], c:1, t:"КПП"},
+
+ {q:"Можно ли покидать пост без разрешения начальника?", a:[
+   "Да, если есть сменщик",
+   "Да, на 5 минут",
+   "Нет, категорически запрещено",
+   "Можно, если пост не на виду"], c:2, t:"КПП"},
+
+ {q:"Как правильно обратиться к старшему по званию?", a:[
+   "«Эй, ты»",
+   "По имени",
+   "«Товарищ [звание]»",
+   "Без обращения"], c:2, t:"Субординация"},
+
+ {q:"Какая форма доклада о заступлении на пост является правильной?", a:[
+   "«Я тут это, ну, встал»",
+   "«Товарищ [звание], боец [ФИО/позывной] заступил на пост КПП»",
+   "«Я на посту, всё»",
+   "Молча начать службу"], c:1, t:"Доклады"},
+
+ {q:"Что относится к срочному докладу?", a:[
+   "Плановая смена караула",
+   "Нападение или ЧП на объекте",
+   "Просьба о перекуре",
+   "Уточнение погоды"], c:1, t:"Радиосвязь"},
+
+ {q:"Что нужно проверить при осмотре документа?", a:[
+   "Только фамилию",
+   "Целостность, фото, срок действия, подлинность",
+   "Только срок действия",
+   "Ничего, достаточно доверия"], c:1, t:"КПП"},
+
+ {q:"Кому подчиняется боец на КПП?", a:[
+   "Только командующему",
+   "Начальнику караула и дежурному",
+   "Никому",
+   "Своим друзьям"], c:1, t:"Субординация"},
+
+ {q:"Что делать при обнаружении подчисток в документе?", a:[
+   "Сделать вид, что не заметил",
+   "Задержать человека и доложить старшему",
+   "Отпустить с предупреждением",
+   "Поругаться с ним"], c:1, t:"КПП"},
+
+ {q:"Разрешено ли использовать эфир для личных разговоров?", a:[
+   "Да, если никто не занят",
+   "Да, ночью",
+   "Нет, эфир служебный",
+   "Можно шёпотом"], c:2, t:"Радиосвязь"},
+
+ {q:"Что означает доклад о прибытии начальства на пост?", a:[
+   "Приветствие и краткий доклад о состоянии поста",
+   "Отказ выполнять приказы",
+   "Просьба о выходном",
+   "Ничего, можно продолжать сидеть"], c:0, t:"Доклады"},
+
+ {q:"Что делать при попытке несанкционированного проникновения?", a:[
+   "Пропустить, чтобы избежать конфликта",
+   "Пресечь попытку и доложить по рации",
+   "Убежать",
+   "Спрятаться"], c:1, t:"КПП"},
+
+ {q:"Какой из признаков подделки документа?", a:[
+   "Ровный шрифт и защитные элементы",
+   "Подчистки, исправления, неровная ламинация",
+   "Срок действия в будущем",
+   "Печать организации"], c:1, t:"КПП"},
+
+ {q:"Что делать, если документ просрочен?", a:[
+   "Пропустить как обычно",
+   "Отказать в проходе и доложить старшему",
+   "Выбросить документ",
+   "Порвать документ"], c:1, t:"КПП"},
+
+ {q:"Как правильно завершить радиообмен?", a:[
+   "Молча выключить рацию",
+   "Убедиться, что тебя услышали, и завершить",
+   "Перебить собеседника",
+   "Сказать что-то шутливое"], c:1, t:"Радиосвязь"},
+
+ {q:"Что считается нарушением субординации?", a:[
+   "Чёткий доклад",
+   "Спор с начальником в рабочее время",
+   "Вежливое обращение",
+   "Соблюдение формы одежды"], c:1, t:"Субординация"},
+
+ {q:"Кто имеет право отдавать приказы?", a:[
+   "Любой военнослужащий",
+   "Старший по званию или должности",
+   "Только командующий",
+   "Никто"], c:1, t:"Субординация"},
+
+ {q:"Что нужно уточнить у посетителя помимо документов?", a:[
+   "Цель визита и разрешение на въезд",
+   "Его любимую еду",
+   "Номер телефона",
+   "Ничего"], c:0, t:"КПП"},
+
+ {q:"Что делать при виде подозрительной ситуации на КПП?", a:[
+   "Ничего",
+   "Доложить старшему по рации",
+   "Уйти домой",
+   "Начать громко спорить"], c:1, t:"КПП"},
+
+ {q:"Что означает субординация?", a:[
+   "Свободное поведение",
+   "Система подчинения младших старшим",
+   "Дружеское общение",
+   "Отказ от дисциплины"], c:1, t:"Субординация"},
+
+ {q:"При равных званиях старшим наряда считается…", a:[
+   "Тот, кто громче говорит",
+   "Тот, кто назначен старшим наряда",
+   "Тот, кто выше ростом",
+   "Тот, кто дольше курит"], c:1, t:"Субординация"},
+
+ {q:"Что делать после обнаружения запрещённого предмета при досмотре?", a:[
+   "Забрать себе",
+   "Задержать лицо и доложить начальнику караула",
+   "Молча отпустить",
+   "Проигнорировать"], c:1, t:"КПП"},
+
+ {q:"Как правильно вести себя в конфликтном диалоге с посетителем?", a:[
+   "Кричать и угрожать",
+   "Спокойно, вежливо и твёрдо",
+   "Игнорировать",
+   "Отвернуться"], c:1, t:"КПП"},
+
+ {q:"Что входит в обязанности младшего состава на КПП?", a:[
+   "Охрана объекта и контроль пропускного режима",
+   "Отдача приказов офицерам",
+   "Отдых весь день",
+   "Выдача наград"], c:0, t:"Введение"},
+
+ {q:"Что делать, если связь с начальником потеряна?", a:[
+   "Бросить пост",
+   "Продолжать службу и доложить о потере связи при первой возможности",
+   "Уйти спать",
+   "Отпустить всех посетителей"], c:1, t:"Радиосвязь"},
+
+ {q:"Что является основанием для допуска посетителя на объект?", a:[
+   "Личное знакомство",
+   "Действительный пропуск и разрешение на въезд",
+   "Слово «я свой»",
+   "Дорогая машина"], c:1, t:"КПП"},
+
+ {q:"Куда докладывать о сдаче поста?", a:[
+   "Никуда",
+   "Начальнику караула по установленной форме",
+   "Друзьям в чате",
+   "В соцсети"], c:1, t:"Доклады"},
+
+ {q:"Какое поведение допустимо при проверке документов?", a:[
+   "Хамить посетителю",
+   "Вежливо, чётко, по регламенту",
+   "Требовать взятку",
+   "Пугать оружием без причины"], c:1, t:"КПП"},
+
+ {q:"Что делать при попытке дать взятку на КПП?", a:[
+   "Принять и пропустить",
+   "Отказаться и доложить старшему",
+   "Взять и промолчать",
+   "Прогнать с криком"], c:1, t:"КПП"},
+
+ {q:"Что такое доклад по форме?", a:[
+   "Короткий, чёткий, по существу",
+   "Долгий монолог",
+   "Шутка",
+   "Письменное сочинение"], c:0, t:"Доклады"},
+
+ {q:"Что запрещено делать на посту?", a:[
+   "Наблюдать за обстановкой",
+   "Спать, есть, отвлекаться на личное",
+   "Докладывать старшему",
+   "Осматривать документы"], c:1, t:"КПП"},
+
+ {q:"Какова цель работы на КПП?", a:[
+   "Пропускать всех",
+   "Контроль доступа и безопасность объекта",
+   "Развлечение",
+   "Отдых"], c:1, t:"Введение"},
+
+ {q:"Что делать, если посетитель угрожает?", a:[
+   "Убежать",
+   "Сообщить по рации и принять меры по регламенту",
+   "Ответить угрозой",
+   "Игнорировать"], c:1, t:"КПП"}
+];
+
+/* ================== ЛОГИКА ТЕСТА ================== */
+const QUIZ_SIZE = 20;   // сколько вопросов в одной попытке (можно менять)
+let quiz = [];
+let answered = new Set();
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function startQuiz(){
+  answered = new Set();
+  quiz = shuffle(QUESTIONS).slice(0, Math.min(QUIZ_SIZE, QUESTIONS.length)).map(q=>{
+    const opts = shuffle(q.a.map((txt, i)=>({txt, ok: i===q.c})) );
+    return {q:q.q, t:q.t, opts};
+  });
+
+  document.getElementById('quizStart').style.display='none';
+  document.getElementById('resultBox').innerHTML='';
+  const box = document.getElementById('quizBox');
+  box.style.display='block';
+
+  const container = document.getElementById('questions');
+  container.innerHTML = quiz.map((item, qi)=>`
+    <div class="q" id="q${qi}">
+      <div class="qt"><span class="num">${qi+1}.</span>${item.q}
+        <span class="tag">${item.t}</span></div>
+      ${item.opts.map((o, oi)=>`
+        <label class="opt" id="o${qi}_${oi}">
+          <input type="radio" name="q${qi}" value="${oi}"
+                 onchange="markAnswered(${qi})">
+          ${o.txt}
+        </label>`).join('')}
+    </div>`).join('');
+
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function markAnswered(qi){
+  answered.add(qi);
+  updateProgress();
+}
+
+function updateProgress(){
+  document.getElementById('progress').textContent =
+    'Всего вопросов: ' + quiz.length;
+  document.getElementById('answered').textContent =
+    'Отвечено: ' + answered.size + ' / ' + quiz.length;
+}
+
+function submitQuiz(){
+  const unanswered = quiz.length - answered.size;
+  if(unanswered > 0){
+    if(!confirm('Вы ответили не на все вопросы (' + unanswered + ' пропущено). Завершить тест?')) return;
+  }
+
+  let correct = 0;
+  const review = [];
+
+  quiz.forEach((item, qi)=>{
+    const chosen = document.querySelector(`input[name="q${qi}"]:checked`);
+    const chosenIdx = chosen ? parseInt(chosen.value) : -1;
+    const correctIdx = item.opts.findIndex(o=>o.ok);
+    const isCorrect = chosenIdx === correctIdx;
+    if(isCorrect) correct++;
+
+    // подсветка
+    item.opts.forEach((o, oi)=>{
+      const el = document.getElementById(`o${qi}_${oi}`);
+      if(oi === correctIdx) el.classList.add('correct');
+      if(oi === chosenIdx && !isCorrect) el.classList.add('wrong');
+    });
+
+    if(!isCorrect){
+      review.push({
+        q: item.q,
+        your: chosenIdx >= 0 ? item.opts[chosenIdx].txt : '— не отвечено —',
+        right: item.opts[correctIdx].txt
+      });
+    }
+  });
+
+  // отключаем дальнейший ввод
+  document.querySelectorAll('#questions input').forEach(i=>i.disabled=true);
+  document.getElementById('submitBtn').style.display='none';
+
+  const total = quiz.length;
+  const percent = Math.round(correct/total*100);
+  let verdict, color;
+  if(percent >= 90){ verdict='ОТЛИЧНО. Допущен к службе.'; color='var(--ok)'; }
+  else if(percent >= 70){ verdict='ХОРОШО. Есть мелкие замечания.'; color='var(--gold)'; }
+  else if(percent >= 50){ verdict='УДОВЛЕТВОРИТЕЛЬНО. Требуется повторная подготовка.'; color='#e08b2f'; }
+  else { verdict='НЕУДОВЛЕТВОРИТЕЛЬНО. Пройдите обучение заново.'; color='var(--bad)'; }
+
+  let html = `
+    <div class="result" style="margin-top:24px;">
+      <div class="score">${correct} / ${total}</div>
+      <div style="color:var(--muted);">${percent}% правильных ответов</div>
+      <div class="verdict" style="color:${color}"><b>${verdict}</b></div>
+    </div>`;
+
+  if(review.length){
+    html += `<h3>Разбор ошибок (${review.length})</h3><div class="review">`;
+    review.forEach((r,i)=>{
+      html += `<div class="item">
+        <b>${i+1}. ${r.q}</b><br>
+        Ваш ответ: <span style="color:#ff9b8a;">${r.your}</span><br>
+        Правильно: <span class="r">${r.right}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div class="card tip" style="margin-top:20px;">Ошибок нет. Отличная подготовка!</div>`;
+  }
+
+  html += `<div class="center">
+      <button class="btn" onclick="restartQuiz()">Пройти заново</button>
+    </div>`;
+
+  document.getElementById('resultBox').innerHTML = html;
+  document.getElementById('resultBox').scrollIntoView({behavior:'smooth'});
+}
+
+function restartQuiz(){
+  document.getElementById('quizBox').style.display='none';
+  document.getElementById('resultBox').innerHTML='';
+  document.getElementById('submitBtn').style.display='inline-block';
+  document.getElementById('quizStart').style.display='block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ================== НАВИГАЦИЯ ================== */
+document.querySelectorAll('nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
